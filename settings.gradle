@@ -1,1 +1,3 @@
-include ':app', ':mvp-kotlin-annotations'
+include ':app'
+include ':mvp-kotlin-annotations'
+include ':mvp-kotlin-compiler'

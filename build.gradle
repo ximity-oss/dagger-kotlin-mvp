@@ -48,30 +48,31 @@ buildscript {
             'dagger'     : '2.15',
             'inject'     : '1',
             'javax'      : '1.3.2',
-            'javapoet'   : '1.10.0',
+            'kotlinpoet' : '1.10.0',
             'kotlin'     : '1.2.31',
     ]
 
     ext.deps = [
-            plugin   : [
+            plugin      : [
                     'android': "com.android.tools.build:gradle:${versions.plugin}",
                     'kotlin' : "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
                     'bintray': "com.jfrog.bintray.gradle:gradle-bintray-plugin:${versions.bintray}",
                     'maven'  : "com.github.dcendents:android-maven-gradle-plugin:${versions.maven}",
             ],
 
-            'auto'   : [
+            'auto'      : [
                     'common' : "com.google.auto:auto-common:${versions.autocommon}",
                     'service': "com.google.auto.service:auto-service:${versions.autoservice}",
             ],
-            dagger   : [
+            'dagger'    : [
                     'library'    : "com.google.dagger:dagger:${versions.dagger}",
                     'compiler'   : "com.google.dagger:dagger-compiler:${versions.dagger}",
                     'annotations': "javax.annotation:javax.annotation-api:${versions.javax}",
                     'inject'     : "javax.inject:javax.inject:${versions.inject}",
             ],
-            kotlin   : "org.jetbrains.kotlin:kotlin-stdlib-jre7:${versions.kotlin}",
-            'support': [
+            'kotlin'    : "org.jetbrains.kotlin:kotlin-stdlib-jre7:${versions.kotlin}",
+            'kotlinpoet': "com.squareup:javapoet:${versions.kotlinpoet}",
+            'support'   : [
                     'appcompatv7': "com.android.support:appcompat-v7:${versions.support}",
                     'annotations': "com.android.support:support-annotations:${versions.support}",
             ],
