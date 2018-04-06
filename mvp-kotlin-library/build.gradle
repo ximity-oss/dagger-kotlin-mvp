@@ -1,0 +1,29 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion versions.compile
+    buildToolsVersion versions.build
+
+    defaultConfig {
+        minSdkVersion versions.min
+        targetSdkVersion versions.compile
+
+        versionCode versions.code
+        versionName versions.name
+
+        consumerProguardFiles file('./proguard-rules').listFiles()
+    }
+}
+
+dependencies {
+    api project(':mvp-kotlin-annotations')
+
+    /** Build dependencies **/
+    api deps.support.appcompatv7
+    implementation deps.support.annotations
+    compileOnly deps.dagger.inject
+}
+
+apply from: rootProject.file('gradle/install.gradle')
+apply from: rootProject.file('gradle/publish.gradle')

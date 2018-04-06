@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
@@ -25,10 +26,13 @@ android {
 }
 
 dependencies {
+    kapt project(':mvp-kotlin-compiler')
+    implementation project(':mvp-kotlin-library')
+
     /** Build dependencies **/
     implementation deps.support.appcompatv7
 
     compileOnly deps.dagger.annotations
     implementation deps.dagger.library
-    annotationProcessor deps.dagger.compiler
+    kapt deps.dagger.compiler
 }

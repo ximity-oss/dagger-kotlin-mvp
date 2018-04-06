@@ -1,3 +1,4 @@
 include ':app'
 include ':mvp-kotlin-annotations'
 include ':mvp-kotlin-compiler'
+include ':mvp-kotlin-library'
