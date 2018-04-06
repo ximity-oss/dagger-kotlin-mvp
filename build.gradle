@@ -17,7 +17,7 @@ buildscript {
         gitConnection = 'scm:git:git://github.com/ximity-oss/dagger-kotlin-mvp'
         gitDeveloperConnection = 'scm:git:ssh://git@github.com/ximity-oss/dagger-kotlin-mvp'
 
-        libraryGroup = 'net.ximity.mvp.kotlin'
+        libraryGroup = 'net.ximity.mvp'
         libraryVersion = '0.0.1'
         libraryCode = 1
 
@@ -42,12 +42,10 @@ buildscript {
             'bintray'    : '1.8.0',
             'dexcount'   : '0.8.2',
             'maven'      : '2.1',
-            'runtime'    : '4.1.1.4',
 
             'autocommon' : '0.10',
             'autoservice': '1.0-rc4',
             'dagger'     : '2.15',
-            'hamcrest'   : '1.3',
             'inject'     : '1',
             'javax'      : '1.3.2',
             'javapoet'   : '1.10.0',
@@ -58,6 +56,8 @@ buildscript {
             plugin   : [
                     'android': "com.android.tools.build:gradle:${versions.plugin}",
                     'kotlin' : "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
+                    'bintray': "com.jfrog.bintray.gradle:gradle-bintray-plugin:${versions.bintray}",
+                    'maven'  : "com.github.dcendents:android-maven-gradle-plugin:${versions.maven}",
             ],
 
             'auto'   : [
@@ -78,6 +78,8 @@ buildscript {
     ]
 }
 
+
+
 subprojects {
     repositories {
         google()
@@ -95,6 +97,8 @@ subprojects {
         dependencies {
             classpath deps.plugin.android
             classpath deps.plugin.kotlin
+            classpath deps.plugin.bintray
+            classpath deps.plugin.maven
         }
     }
 }
