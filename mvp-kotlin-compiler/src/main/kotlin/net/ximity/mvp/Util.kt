@@ -1,8 +1,10 @@
 package net.ximity.mvp
 
+import com.squareup.javapoet.JavaFile
 import com.squareup.kotlinpoet.FileSpec
 import net.ximity.annotation.MvpContract
 import java.io.File
+import java.io.IOException
 import javax.annotation.processing.Filer
 import javax.annotation.processing.Messager
 import javax.annotation.processing.ProcessingEnvironment
@@ -95,6 +97,17 @@ object Util {
     internal fun isSubTypePresenter(type: TypeMirror): Boolean {
         val viewPresenter = elementUtil!!.getTypeElement("net.ximity.mvp.contract.MvpPresenter").asType()
         return typeUtil!!.isSubtype(type, viewPresenter)
+    }
+
+    fun writeJavaFile(file: JavaFile, generatedFile: String) {
+        if (!isEmpty(generatedFile)) Util.note("Generating $generatedFile...")
+        try {
+            file.writeTo(filer)
+            if (!isEmpty(generatedFile)) Util.note("Generated $generatedFile")
+        } catch (e: IOException) {
+            if (!isEmpty(generatedFile)) Util.warn("Unable to generate file for $generatedFile!")
+        }
+
     }
 }
 

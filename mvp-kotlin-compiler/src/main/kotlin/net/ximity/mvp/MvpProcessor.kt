@@ -1,6 +1,8 @@
 package net.ximity.mvp
 
 import com.google.auto.common.MoreElements.getPackage
+import com.squareup.javapoet.JavaFile
+import com.squareup.javapoet.MethodSpec
 import com.squareup.kotlinpoet.*
 import net.ximity.annotation.MvpContract
 import net.ximity.annotation.MvpMainComponent
@@ -84,7 +86,7 @@ class MvpProcessor : AbstractProcessor() {
         val viewImplements = view?.interfaces as List<TypeMirror>
         val presenter = Util.getPresenter(element)
         val presenterImplements = presenter?.interfaces as List<TypeMirror>
-        val presenterAnnotation = presenter.getAnnotation(MvpScope::class.java)
+        presenter.getAnnotation(MvpScope::class.java)
                 ?: Util.error("${presenter.simpleName} does not have a ${MvpScope::class.java.simpleName} scope!!!")
                         .also { return false }
         val moduleClassName = if (Util.isEmpty(contract.module)) {
@@ -131,7 +133,7 @@ class MvpProcessor : AbstractProcessor() {
 
         val moduleFunctions = ArrayList<FunSpec>()
 
-        moduleFunctions.add(FunSpec.builder("providesView")
+        moduleFunctions.add(FunSpec.builder("provides${element.simpleName}View")
                 .addAnnotation(MvpScope::class)
                 .addAnnotation(ClassName("dagger", "Provides"))
                 .addModifiers(KModifier.INTERNAL)
@@ -139,7 +141,7 @@ class MvpProcessor : AbstractProcessor() {
                 .addStatement("return view")
                 .build())
 
-        moduleFunctions.add(FunSpec.builder("providesPresenter")
+        moduleFunctions.add(FunSpec.builder("provides${element.simpleName}Presenter")
                 .addAnnotation(MvpScope::class)
                 .addAnnotation(ClassName("dagger", "Provides"))
                 .addModifiers(KModifier.INTERNAL)
@@ -150,7 +152,7 @@ class MvpProcessor : AbstractProcessor() {
                 .build())
 
         if (isViewPresenter) {
-            moduleFunctions.add(FunSpec.builder("providesMvpPresenter")
+            moduleFunctions.add(FunSpec.builder("provides${element.simpleName}MvpPresenter")
                     .addAnnotation(MvpScope::class)
                     .addAnnotation(ClassName("dagger", "Provides"))
                     .addModifiers(KModifier.INTERNAL)
@@ -162,6 +164,9 @@ class MvpProcessor : AbstractProcessor() {
         }
 
         FileSpec.builder(packageName, moduleClassName)
+                .addAnnotation(AnnotationSpec.builder(JvmName::class)
+                        .addMember("%S", moduleClassName)
+                        .build())
                 .addType(TypeSpec.classBuilder(moduleClassName)
                         .addAnnotation(ClassName("dagger", "Module"))
                         .primaryConstructor(FunSpec.constructorBuilder()
@@ -224,6 +229,9 @@ class MvpProcessor : AbstractProcessor() {
         }
 
         FileSpec.builder(packageName, componentName)
+                .addAnnotation(AnnotationSpec.builder(JvmName::class)
+                        .addMember("%S", componentName)
+                        .build())
                 .addType(TypeSpec.interfaceBuilder(componentName)
                         .addAnnotation(MvpScope::class)
                         .addAnnotation(AnnotationSpec.builder(ClassName("dagger", "Subcomponent"))
@@ -490,20 +498,40 @@ class MvpProcessor : AbstractProcessor() {
         val component = element.getAnnotation(MvpMainComponent::class.java)
         val componentName = component.name
 
-        val bindingBuilder = TypeSpec.interfaceBuilder(componentName)
+        val bindingBuilder = com.squareup.javapoet.TypeSpec.interfaceBuilder(componentName)
+                .addModifiers(Modifier.PUBLIC)
+
         bindings.forEach {
-            bindingBuilder.addFunction(FunSpec.builder("add")
-                    .addModifiers(KModifier.ABSTRACT)
-                    .addParameter("module",ClassName(it.packageName, it.moduleName))
-                    .returns(ClassName(it.packageName, it.componentName))
+            bindingBuilder.addMethod(MethodSpec.methodBuilder("add")
+                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                    .addParameter(com.squareup.javapoet.ClassName.get(it.packageName, it.moduleName), "module")
+                    .returns(com.squareup.javapoet.ClassName.get(it.packageName, it.componentName))
                     .build())
         }
 
-        val packageName = getPackage(element).qualifiedName.toString()
-        FileSpec.builder(packageName, componentName)
-                .addType(bindingBuilder.build())
-                .build()
-                .writeFile()
+        bindingBuilder.build()
+                .let {
+                    JavaFile.builder(getPackage(element).qualifiedName.toString(), it)
+                            .build()
+                }.let { Util.writeJavaFile(it, componentName) }
+
+//        val bindingBuilder = TypeSpec.interfaceBuilder(componentName)
+//        bindings.forEach {
+//            bindingBuilder.addFunction(FunSpec.builder("add")
+//                    .addModifiers(KModifier.ABSTRACT)
+//                    .addParameter("module", ClassName(it.packageName, it.moduleName))
+//                    .returns(ClassName(it.packageName, it.componentName))
+//                    .build())
+//        }
+//
+//        val packageName = getPackage(element).qualifiedName.toString()
+//        FileSpec.builder(packageName, componentName)
+//                .addAnnotation(AnnotationSpec.builder(JvmName::class)
+//                        .addMember("%S", componentName)
+//                        .build())
+//                .addType(bindingBuilder.build())
+//                .build()
+//                .writeFile()
         return true
     }
 }

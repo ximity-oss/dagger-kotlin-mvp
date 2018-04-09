@@ -5,14 +5,13 @@ import net.ximity.sample.AppComponent
 import net.ximity.sample.R
 import net.ximity.sample.common.BaseActivity
 import net.ximity.sample.login.mvp.LoginMvp
-import net.ximity.sample.login.mvp.LoginMvpModule
 
 class LoginView :
         BaseActivity(),
         LoginMvp.View {
 
-    override fun bind(component: AppComponent) = component.add(LoginMvpModule(this))
-            .bind(this)
+    override fun bind(component: AppComponent) {
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

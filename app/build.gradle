@@ -25,9 +25,16 @@ android {
     }
 }
 
+kapt {
+    correctErrorTypes = true
+}
+
+sourceSets {
+    main.java.srcDirs += [file("$buildDir/generated/source/kapt/main")]
+}
+
 dependencies {
     /** Module dependencies **/
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     kapt project(':mvp-kotlin-compiler')
     implementation project(':mvp-kotlin-library')
 
