@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">ximity-dagger-mvp-kotlin</string>
+    <string name="app_name">Sample MVP</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
 </resources>

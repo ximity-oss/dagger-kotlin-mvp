@@ -2,19 +2,23 @@ package net.ximity.mvp.contract
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
 
 /**
  * Base view presenter contract with hooks to view lifecycle
+ *
  * @author by Emarc Magtanong on 2018/04/07.
  */
-interface Presenter {
+interface MvpPresenter {
     /**
-     * Lifecycle callback bound to [Activity.onCreate] or [Fragment.onCreate]
+     * Lifecycle callback bound to [Activity.onCreate] or [Fragment.onViewCreated]
+     *
+     * @param saved saved state bundle, non-null if previously recreated view
      */
     @SuppressLint("LogNotTimber")
-    fun create() = Log.d("Presenter", "Created: ${this}")
+    fun create(saved: Bundle?) = Log.d("Presenter", "Created: ${this}")
 
     /**
      * Lifecycle callback for the presenter to start. For a view presenter, this will bind to
@@ -22,6 +26,22 @@ interface Presenter {
      */
     @SuppressLint("LogNotTimber")
     fun start() = Log.d("Presenter", "Started: ${this}")
+
+    /**
+     * Lifecycle callback for the presenter to pause. For a view presenter, this will bind to
+     * [Activity.onPause] or [Fragment.onPause]
+     */
+    @SuppressLint("LogNotTimber")
+    fun pause() = Log.d("Presenter", "Paused: ${this}")
+
+    /**
+     * Lifecycle callback for the presenter to save state. For a view presenter, this will bind to
+     * [Activity.onSaveInstanceState] or [Fragment.onSaveInstanceState]
+     *
+     * @param out out state bundle
+     */
+    @SuppressLint("LogNotTimber")
+    fun saveState(out: Bundle) = Log.d("Presenter", "Saved: ${this}")
 
     /**
      * Lifecycle callback for the presenter to stop. For a view presenter, this will bind to

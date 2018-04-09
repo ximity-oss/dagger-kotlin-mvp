@@ -17,6 +17,7 @@ android {
 }
 
 dependencies {
+    /** Module dependencies **/
     api project(':mvp-kotlin-annotations')
 
     /** Build dependencies **/

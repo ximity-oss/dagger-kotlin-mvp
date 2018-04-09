@@ -26,6 +26,8 @@ android {
 }
 
 dependencies {
+    /** Module dependencies **/
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     kapt project(':mvp-kotlin-compiler')
     implementation project(':mvp-kotlin-library')
 
