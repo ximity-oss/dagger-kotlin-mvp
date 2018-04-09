@@ -10,4 +10,5 @@ import net.ximity.mvp.template.ActivityView
  */
 abstract class BaseActivity
     : ActivityView(),
-        MvpView
+        MvpView {
+}

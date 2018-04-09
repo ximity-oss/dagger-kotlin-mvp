@@ -6,5 +6,6 @@ class SampleApplication : BaseMvpApplication() {
 
     override fun initializeMainComponent(): AppComponent =
             DaggerAppComponent.builder()
+                    .mainModule(MainModule(this))
                     .build()
 }

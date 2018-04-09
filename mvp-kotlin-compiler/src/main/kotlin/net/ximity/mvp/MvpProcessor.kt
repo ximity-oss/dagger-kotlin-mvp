@@ -1,6 +1,8 @@
 package net.ximity.mvp
 
 import com.google.auto.common.MoreElements.getPackage
+import com.squareup.javapoet.AnnotationSpec
+import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.MethodSpec
 import com.squareup.kotlinpoet.*
@@ -11,7 +13,6 @@ import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
 import javax.annotation.processing.SupportedAnnotationTypes
-import javax.inject.Inject
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.Modifier
@@ -131,58 +132,49 @@ class MvpProcessor : AbstractProcessor() {
                 .flatMap { it.stream() }
                 .anyMatch(Util::isSubTypePresenter)
 
-        val moduleFunctions = ArrayList<FunSpec>()
+        val moduleFunctions = ArrayList<MethodSpec>()
 
-        moduleFunctions.add(FunSpec.builder("provides${element.simpleName}View")
-                .addAnnotation(MvpScope::class)
-                .addAnnotation(ClassName("dagger", "Provides"))
-                .addModifiers(KModifier.INTERNAL)
-                .returns(viewInterface.get().asClassName())
+        moduleFunctions.add(MethodSpec.methodBuilder("providesView")
+                .addAnnotation(MvpScope::class.java)
+                .addAnnotation(com.squareup.javapoet.ClassName.get("dagger", "Provides"))
+                .returns(com.squareup.javapoet.ClassName.get(viewInterface.get()))
                 .addStatement("return view")
                 .build())
 
-        moduleFunctions.add(FunSpec.builder("provides${element.simpleName}Presenter")
-                .addAnnotation(MvpScope::class)
-                .addAnnotation(ClassName("dagger", "Provides"))
-                .addModifiers(KModifier.INTERNAL)
-                .addParameter(ParameterSpec.builder("impl", presenter.asClassName())
-                        .build())
-                .returns(presenterInterface.get().asClassName())
+        moduleFunctions.add(MethodSpec.methodBuilder("providesPresenter")
+                .addAnnotation(MvpScope::class.java)
+                .addAnnotation(com.squareup.javapoet.ClassName.get("dagger", "Provides"))
+                .addParameter(com.squareup.javapoet.ClassName.get(presenter), "impl")
+                .returns(com.squareup.javapoet.ClassName.get(presenterInterface.get()))
                 .addStatement("return impl")
                 .build())
 
         if (isViewPresenter) {
-            moduleFunctions.add(FunSpec.builder("provides${element.simpleName}MvpPresenter")
-                    .addAnnotation(MvpScope::class)
-                    .addAnnotation(ClassName("dagger", "Provides"))
-                    .addModifiers(KModifier.INTERNAL)
-                    .addParameter(ParameterSpec.builder("impl", presenter.asClassName())
-                            .build())
-                    .returns(ClassName(contractPackageName, "MvpPresenter"))
+            moduleFunctions.add(MethodSpec.methodBuilder("providesMvpPresenter")
+                    .addAnnotation(MvpScope::class.java)
+                    .addAnnotation(com.squareup.javapoet.ClassName.get("dagger", "Provides"))
+                    .addParameter(com.squareup.javapoet.ClassName.get(presenter), "impl")
+                    .returns(com.squareup.javapoet.ClassName.get(contractPackageName, "MvpPresenter"))
                     .addStatement("return impl")
                     .build())
         }
 
-        FileSpec.builder(packageName, moduleClassName)
-                .addAnnotation(AnnotationSpec.builder(JvmName::class)
-                        .addMember("%S", moduleClassName)
+        Util.writeJavaFile(JavaFile.builder(packageName, com.squareup.javapoet.TypeSpec.classBuilder(moduleClassName)
+                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .addAnnotation(com.squareup.javapoet.ClassName.get("dagger", "Module"))
+                .addField(FieldSpec.builder(com.squareup.javapoet.ClassName.get(viewInterface.get()), "view")
+                        .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
                         .build())
-                .addType(TypeSpec.classBuilder(moduleClassName)
-                        .addAnnotation(ClassName("dagger", "Module"))
-                        .primaryConstructor(FunSpec.constructorBuilder()
-                                .addParameter(ParameterSpec.builder("view", viewInterface.get().asClassName())
-                                        .addModifiers(KModifier.PRIVATE)
-                                        .build())
+                .addMethod(MethodSpec.constructorBuilder()
+                        .addParameter(com.squareup.javapoet.ParameterSpec.builder(com.squareup.javapoet.ClassName.get(viewInterface.get()), "view")
+                                .addAnnotation(com.squareup.javapoet.ClassName.get("android.support.annotation", "NonNull"))
                                 .build())
-                        .addProperty(PropertySpec.builder("view", viewInterface.get().asClassName())
-                                .initializer("view")
-                                .addModifiers(KModifier.PRIVATE)
-                                .build())
-                        .addFunctions(moduleFunctions)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("this.\$N = \$N", "view", "view")
                         .build())
-
-                .build()
-                .writeFile()
+                .addMethods(moduleFunctions)
+                .build())
+                .build(), moduleClassName)
 
         return true
     }
@@ -228,22 +220,21 @@ class MvpProcessor : AbstractProcessor() {
             return false
         }
 
-        FileSpec.builder(packageName, componentName)
-                .addAnnotation(AnnotationSpec.builder(JvmName::class)
-                        .addMember("%S", componentName)
+        val mvpBindings = com.squareup.javapoet.TypeSpec.interfaceBuilder(componentName)
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(MvpScope::class.java)
+                .addAnnotation(AnnotationSpec.builder(com.squareup.javapoet.ClassName.get("dagger", "Subcomponent"))
+                        .addMember("modules", "\$N.class", moduleName)
                         .build())
-                .addType(TypeSpec.interfaceBuilder(componentName)
-                        .addAnnotation(MvpScope::class)
-                        .addAnnotation(AnnotationSpec.builder(ClassName("dagger", "Subcomponent"))
-                                .addMember("%L = [%T::class]", "modules", ClassName(packageName, moduleName))
-                                .build())
-                        .addFunction(FunSpec.builder("bind")
-                                .addParameter("view", view.asClassName())
-                                .addModifiers(KModifier.ABSTRACT)
-                                .build())
+                .addMethod(MethodSpec.methodBuilder("bind")
+                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                        .addParameter(com.squareup.javapoet.ClassName.get(view), view.simpleName.toString())
+                        .returns(com.squareup.javapoet.ClassName.get(view))
                         .build())
                 .build()
-                .writeFile()
+
+        Util.writeJavaFile(JavaFile.builder(packageName, mvpBindings)
+                .build(), componentName)
 
         bindings.add(Binding(packageName, componentName, moduleName))
         return true
@@ -347,12 +338,10 @@ class MvpProcessor : AbstractProcessor() {
         val mainComponent = ClassName.bestGuess(element.toString())
         val activityMethods = ArrayList<FunSpec>()
 
-        activityMethods.add(FunSpec.builder("injectPresenter")
-                .addModifiers(KModifier.INTERNAL)
+        activityMethods.add(FunSpec.builder("bindPresenter")
                 .addParameter(ParameterSpec.builder("viewPresenter", ClassName(contractPackageName, "MvpPresenter"))
                         .build())
-                .addStatement("presenter = viewPresenter")
-                .addAnnotation(Inject::class)
+                .addStatement("this.viewPresenter = viewPresenter")
                 .build())
 
         activityMethods.add(FunSpec.builder("onCreate")
@@ -361,13 +350,13 @@ class MvpProcessor : AbstractProcessor() {
                         .build())
                 .addModifiers(KModifier.OVERRIDE)
                 .addStatement("super.onCreate(savedInstanceState)")
-                .addStatement("presenter.create(savedInstanceState)")
+                .addStatement("viewPresenter?.create(savedInstanceState)")
                 .build())
 
         activityMethods.add(FunSpec.builder("onStart")
                 .addModifiers(KModifier.OVERRIDE)
                 .addStatement("super.onStart()")
-                .addStatement("presenter.start()")
+                .addStatement("viewPresenter?.start()")
                 .build())
 
         activityMethods.add(FunSpec.builder("onSaveInstanceState")
@@ -376,25 +365,25 @@ class MvpProcessor : AbstractProcessor() {
                         .asNonNullable())
                         .build())
                 .addStatement("super.onSaveInstanceState(outState)")
-                .addStatement("presenter.saveState(outState)")
+                .addStatement("viewPresenter?.saveState(outState)")
                 .build())
 
         activityMethods.add(FunSpec.builder("onPause")
                 .addModifiers(KModifier.OVERRIDE)
                 .addStatement("super.onPause()")
-                .addStatement("presenter.pause()")
+                .addStatement("viewPresenter?.pause()")
                 .build())
 
         activityMethods.add(FunSpec.builder("onStop")
                 .addModifiers(KModifier.OVERRIDE)
                 .addStatement("super.onStop()")
-                .addStatement("presenter.stop()")
+                .addStatement("viewPresenter?.stop()")
                 .build())
 
         activityMethods.add(FunSpec.builder("onDestroy")
                 .addModifiers(KModifier.OVERRIDE)
                 .addStatement("super.onDestroy()")
-                .addStatement("presenter.destroy()")
+                .addStatement("viewPresenter?.destroy()")
                 .build())
 
         val baseActivity = ClassName(templatePackageName, "MvpActivity")
@@ -402,8 +391,10 @@ class MvpProcessor : AbstractProcessor() {
                 .addType(TypeSpec.classBuilder("ActivityView")
                         .addModifiers(KModifier.ABSTRACT)
                         .superclass(ParameterizedTypeName.get(baseActivity, mainComponent))
-                        .addProperty(PropertySpec.varBuilder("presenter", ClassName(contractPackageName, "MvpPresenter"))
-                                .addModifiers(KModifier.PRIVATE, KModifier.LATEINIT)
+                        .addProperty(PropertySpec.varBuilder("viewPresenter", ClassName(contractPackageName, "MvpPresenter")
+                                .asNullable())
+                                .addModifiers(KModifier.PRIVATE)
+                                .initializer("null")
                                 .build())
                         .addFunctions(activityMethods)
                         .build())
@@ -412,12 +403,10 @@ class MvpProcessor : AbstractProcessor() {
 
         val fragmentMethods = ArrayList<FunSpec>()
 
-        fragmentMethods.add(FunSpec.builder("injectPresenter")
-                .addModifiers(KModifier.INTERNAL)
+        fragmentMethods.add(FunSpec.builder("bindPresenter")
                 .addParameter(ParameterSpec.builder("viewPresenter", ClassName(contractPackageName, "MvpPresenter"))
                         .build())
-                .addStatement("presenter = viewPresenter")
-                .addAnnotation(Inject::class)
+                .addStatement("this.viewPresenter = viewPresenter")
                 .build())
 
         fragmentMethods.add(FunSpec.builder("onViewCreated")
@@ -429,13 +418,13 @@ class MvpProcessor : AbstractProcessor() {
                         .asNullable())
                         .build())
                 .addStatement("super.onViewCreated(view, savedInstanceState)")
-                .addStatement("presenter.create(savedInstanceState)")
+                .addStatement("viewPresenter?.create(savedInstanceState)")
                 .build())
 
         fragmentMethods.add(FunSpec.builder("onStart")
                 .addModifiers(KModifier.OVERRIDE)
                 .addStatement("super.onStart()")
-                .addStatement("presenter.start()")
+                .addStatement("viewPresenter?.start()")
                 .build())
 
         fragmentMethods.add(FunSpec.builder("onSaveInstanceState")
@@ -444,25 +433,25 @@ class MvpProcessor : AbstractProcessor() {
                         .asNonNullable())
                         .build())
                 .addStatement("super.onSaveInstanceState(outState)")
-                .addStatement("presenter.saveState(outState)")
+                .addStatement("viewPresenter?.saveState(outState)")
                 .build())
 
         fragmentMethods.add(FunSpec.builder("onPause")
                 .addModifiers(KModifier.OVERRIDE)
                 .addStatement("super.onPause()")
-                .addStatement("presenter.pause()")
+                .addStatement("viewPresenter?.pause()")
                 .build())
 
         fragmentMethods.add(FunSpec.builder("onStop")
                 .addModifiers(KModifier.OVERRIDE)
                 .addStatement("super.onStop()")
-                .addStatement("presenter.stop()")
+                .addStatement("viewPresenter?.stop()")
                 .build())
 
         fragmentMethods.add(FunSpec.builder("onDestroy")
                 .addModifiers(KModifier.OVERRIDE)
                 .addStatement("super.onDestroy()")
-                .addStatement("presenter.destroy()")
+                .addStatement("viewPresenter?.destroy()")
                 .build())
 
         val baseFragment = ClassName(templatePackageName, "MvpFragment")
@@ -470,8 +459,10 @@ class MvpProcessor : AbstractProcessor() {
                 .addType(TypeSpec.classBuilder("FragmentView")
                         .addModifiers(KModifier.ABSTRACT)
                         .superclass(ParameterizedTypeName.get(baseFragment, mainComponent))
-                        .addProperty(PropertySpec.varBuilder("presenter", ClassName(contractPackageName, "MvpPresenter"))
-                                .addModifiers(KModifier.PRIVATE, KModifier.LATEINIT)
+                        .addProperty(PropertySpec.varBuilder("viewPresenter", ClassName(contractPackageName, "MvpPresenter")
+                                .asNullable())
+                                .addModifiers(KModifier.PRIVATE)
+                                .initializer("null")
                                 .build())
                         .addFunctions(fragmentMethods)
                         .build())
@@ -483,8 +474,10 @@ class MvpProcessor : AbstractProcessor() {
                 .addType(TypeSpec.classBuilder("DialogView")
                         .addModifiers(KModifier.ABSTRACT)
                         .superclass(ParameterizedTypeName.get(baseDialog, mainComponent))
-                        .addProperty(PropertySpec.varBuilder("presenter", ClassName(contractPackageName, "MvpPresenter"))
-                                .addModifiers(KModifier.PRIVATE, KModifier.LATEINIT)
+                        .addProperty(PropertySpec.varBuilder("viewPresenter", ClassName(contractPackageName, "MvpPresenter")
+                                .asNullable())
+                                .addModifiers(KModifier.PRIVATE)
+                                .initializer("null")
                                 .build())
                         .addFunctions(fragmentMethods)
                         .build())
@@ -515,23 +508,6 @@ class MvpProcessor : AbstractProcessor() {
                             .build()
                 }.let { Util.writeJavaFile(it, componentName) }
 
-//        val bindingBuilder = TypeSpec.interfaceBuilder(componentName)
-//        bindings.forEach {
-//            bindingBuilder.addFunction(FunSpec.builder("add")
-//                    .addModifiers(KModifier.ABSTRACT)
-//                    .addParameter("module", ClassName(it.packageName, it.moduleName))
-//                    .returns(ClassName(it.packageName, it.componentName))
-//                    .build())
-//        }
-//
-//        val packageName = getPackage(element).qualifiedName.toString()
-//        FileSpec.builder(packageName, componentName)
-//                .addAnnotation(AnnotationSpec.builder(JvmName::class)
-//                        .addMember("%S", componentName)
-//                        .build())
-//                .addType(bindingBuilder.build())
-//                .build()
-//                .writeFile()
         return true
     }
 }

@@ -18,21 +18,27 @@ interface MvpPresenter {
      * @param saved saved state bundle, non-null if previously recreated view
      */
     @SuppressLint("LogNotTimber")
-    fun create(saved: Bundle?) = Log.d("Presenter", "Created: ${this}")
+    fun create(saved: Bundle?) {
+        Log.d("Presenter", "Created: ${this}")
+    }
 
     /**
      * Lifecycle callback for the presenter to start. For a view presenter, this will bind to
      * [Activity.onStart] or [Fragment.onStart]
      */
     @SuppressLint("LogNotTimber")
-    fun start() = Log.d("Presenter", "Started: ${this}")
+    fun start() {
+        Log.d("Presenter", "Started: ${this}")
+    }
 
     /**
      * Lifecycle callback for the presenter to pause. For a view presenter, this will bind to
      * [Activity.onPause] or [Fragment.onPause]
      */
     @SuppressLint("LogNotTimber")
-    fun pause() = Log.d("Presenter", "Paused: ${this}")
+    fun pause() {
+        Log.d("Presenter", "Paused: ${this}")
+    }
 
     /**
      * Lifecycle callback for the presenter to save state. For a view presenter, this will bind to
@@ -41,18 +47,24 @@ interface MvpPresenter {
      * @param out out state bundle
      */
     @SuppressLint("LogNotTimber")
-    fun saveState(out: Bundle) = Log.d("Presenter", "Saved: ${this}")
+    fun saveState(out: Bundle) {
+        Log.d("Presenter", "Saved: ${this}")
+    }
 
     /**
      * Lifecycle callback for the presenter to stop. For a view presenter, this will bind to
      * [Activity.onStop] or [Fragment.onStop]
      */
     @SuppressLint("LogNotTimber")
-    fun stop() = Log.d("Presenter", "Stopped: ${this}")
+    fun stop() {
+        Log.d("Presenter", "Stopped: ${this}")
+    }
 
     /**
      * Lifecycle callback bound to [Activity.onDestroy] or [Fragment.onDestroy]
      */
     @SuppressLint("LogNotTimber")
-    fun destroy() = Log.d("Presenter", "Destroyed: ${this}")
+    fun destroy() {
+        Log.d("Presenter", "Destroyed: ${this}")
+    }
 }

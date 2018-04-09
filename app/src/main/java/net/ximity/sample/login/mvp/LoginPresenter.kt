@@ -1,6 +1,7 @@
 package net.ximity.sample.login.mvp
 
 import android.content.res.Resources
+import android.util.Log
 import net.ximity.annotation.MvpScope
 import net.ximity.sample.login.LoginView
 import javax.inject.Inject
@@ -17,6 +18,11 @@ class LoginPresenter @Inject internal constructor(
         /** Application resources **/
         private val resources: Resources
 ) : LoginMvp.Presenter {
+
+    override fun start() {
+        super.start()
+        Log.d("LoginPresenter", "Started: ${this}")
+    }
     override fun login() {
     }
 }
