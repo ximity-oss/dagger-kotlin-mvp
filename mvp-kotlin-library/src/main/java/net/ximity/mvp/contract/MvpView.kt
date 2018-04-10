@@ -15,7 +15,9 @@ interface MvpView {
      * @param message error message
      */
     @SuppressLint("LogNotTimber")
-    fun showError(message: String) = Log.d("MvpView", message)
+    fun showError(message: String) {
+        Log.d("MvpView", message)
+    }
 
     /**
      * Checks if the view is currently visible to the user

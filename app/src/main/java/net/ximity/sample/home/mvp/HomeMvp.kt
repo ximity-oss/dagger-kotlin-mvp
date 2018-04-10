@@ -12,7 +12,12 @@ import net.ximity.sample.home.HomeView
  */
 @MvpContract(view = HomeView::class, presenter = HomePresenter::class)
 interface HomeMvp {
-    interface View : AuthView
+    interface View : AuthView {
+        /**
+         * Callback on logout success
+         */
+        fun onLogout()
+    }
 
     interface Presenter : MvpPresenter {
         /**

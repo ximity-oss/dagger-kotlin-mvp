@@ -1,5 +1,6 @@
 package net.ximity.sample.common
 
+import android.widget.Toast
 import net.ximity.mvp.contract.MvpView
 import net.ximity.mvp.template.ActivityView
 
@@ -11,4 +12,8 @@ import net.ximity.mvp.template.ActivityView
 abstract class BaseActivity
     : ActivityView(),
         MvpView {
+
+    override fun showError(message: String) =
+            Toast.makeText(this, message, Toast.LENGTH_SHORT)
+                    .show()
 }

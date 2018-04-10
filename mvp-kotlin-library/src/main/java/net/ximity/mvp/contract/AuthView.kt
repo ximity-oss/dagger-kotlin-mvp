@@ -7,7 +7,7 @@ import android.util.Log
  *
  * @author by Emarc Magtanong on 2018/04/07.
  */
-interface AuthView {
+interface AuthView : MvpView {
     /**
      * Callback for authentication error
      */

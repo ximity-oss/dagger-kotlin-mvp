@@ -2,4 +2,6 @@
     <string name="app_name">Sample MVP</string>
     <string name="login">Login</string>
     <string name="logout">Logout</string>
+    <string name="logging_in">Logging in…</string>
+    <string name="logging_out">Logging out…</string>
 </resources>
