@@ -19,11 +19,10 @@ class LoginView :
     @Inject
     internal lateinit var presenter: LoginMvp.Presenter
 
-    override fun bind(component: AppComponent) {
-        component.add(LoginMvpModule(this))
-                .bind(this)
-                .bindPresenter(presenter)
-    }
+    override fun bind(component: AppComponent) =
+            component.add(LoginMvpModule(this))
+                    .bind(this)
+                    .bindPresenter(presenter)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
