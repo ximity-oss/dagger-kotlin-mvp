@@ -18,7 +18,7 @@ buildscript {
         gitDeveloperConnection = 'scm:git:ssh://git@github.com/ximity-oss/dagger-kotlin-mvp'
 
         libraryGroup = 'net.ximity.mvp'
-        libraryVersion = '0.0.2'
+        libraryVersion = '0.0.3'
         libraryCode = 1
 
         developerId = 'ximity-inc'
