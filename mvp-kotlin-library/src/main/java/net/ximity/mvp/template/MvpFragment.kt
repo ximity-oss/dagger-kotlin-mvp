@@ -14,7 +14,7 @@ abstract class MvpFragment<in M : Any> : Fragment() {
         super.onAttach(context)
         MvpApplication.getApp<MvpApplication<M>>(context)
                 .getComponent()
-                ?.let(this::bind)
+                .let(this::bind)
     }
 
     /**

@@ -13,7 +13,7 @@ abstract class MvpBroadcastReceiver<in M : Any> : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         MvpApplication.getApp<MvpApplication<M>>(context)
                 .getComponent()
-                ?.let(this::bind)
+                .let(this::bind)
     }
 
     /**

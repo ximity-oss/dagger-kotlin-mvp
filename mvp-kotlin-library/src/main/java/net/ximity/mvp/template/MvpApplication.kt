@@ -13,7 +13,7 @@ abstract class MvpApplication<out M : Any> : Application() {
     /** Application main component  */
     private lateinit var component: M
 
-    fun getComponent(): M? = component
+    fun getComponent(): M = component
 
     override fun onCreate() {
         super.onCreate()

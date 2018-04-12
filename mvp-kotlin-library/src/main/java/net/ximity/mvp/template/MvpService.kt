@@ -13,7 +13,7 @@ abstract class MvpService<in M : Any> : Service() {
         super.onCreate()
         MvpApplication.getApp<MvpApplication<M>>(this)
                 .getComponent()
-                ?.let(this::bind)
+                .let(this::bind)
     }
 
     /**

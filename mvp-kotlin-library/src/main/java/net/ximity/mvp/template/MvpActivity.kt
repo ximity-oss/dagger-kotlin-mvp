@@ -14,7 +14,7 @@ abstract class MvpActivity<in M : Any> : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         MvpApplication.getApp<MvpApplication<M>>(this)
                 .getComponent()
-                ?.let(this::bind)
+                .let(this::bind)
     }
 
     /**

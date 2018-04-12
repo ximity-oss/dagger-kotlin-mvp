@@ -14,7 +14,7 @@ abstract class MvpDialog<in M : Any> : DialogFragment() {
         super.onAttach(context)
         MvpApplication.getApp<MvpApplication<M>>(context)
                 .getComponent()
-                ?.let(this::bind)
+                .let(this::bind)
     }
 
     /**
