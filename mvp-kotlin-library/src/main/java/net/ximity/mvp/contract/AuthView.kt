@@ -12,5 +12,7 @@ interface AuthView : MvpView {
      * Callback for authentication error
      */
     @SuppressWarnings("LogNotTimber")
-    fun showLogin() = Log.d("AuthView", "User is not authenticated in an Authenticated View.")
+    fun showLogin() {
+        Log.d("AuthView", "User is not authenticated in an Authenticated View.")
+    }
 }
