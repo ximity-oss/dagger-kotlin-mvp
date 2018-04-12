@@ -20,7 +20,7 @@ abstract class MvpFragment<in M : Any> : Fragment() {
     /**
      * Injects dependencies with global scope
      *
-     * @param component component to bind globally scoped dependencies
+     * @param component main component to bind globally scoped dependencies
      */
     protected abstract fun bind(component: M)
 }

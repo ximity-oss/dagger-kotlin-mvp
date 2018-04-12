@@ -19,7 +19,7 @@ abstract class MvpService<in M : Any> : Service() {
     /**
      * Injects dependencies with global scope
      *
-     * @param mainComponent component to bind globally scoped dependencies
+     * @param component main component to bind globally scoped dependencies
      */
-    protected abstract fun bind(mainComponent: M)
+    protected abstract fun bind(component: M)
 }
