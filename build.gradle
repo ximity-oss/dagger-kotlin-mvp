@@ -48,7 +48,7 @@ buildscript {
             'inject'    : '1',
             'javax'     : '1.3.2',
             'kotlinpoet': '0.7.0',
-            'kotlin'    : '1.2.31',
+            'kotlin'    : '1.2.40',
             'javapoet'  : '1.10.0',
     ]
 
@@ -69,7 +69,7 @@ buildscript {
                     'annotations': "javax.annotation:javax.annotation-api:${versions.javax}",
                     'inject'     : "javax.inject:javax.inject:${versions.inject}",
             ],
-            'kotlin' : "org.jetbrains.kotlin:kotlin-stdlib-jre7:${versions.kotlin}",
+            'kotlin' : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}",
             'poet'   : [
                     'java'  : "com.squareup:javapoet:${versions.javapoet}",
                     'kotlin': "com.squareup:kotlinpoet:${versions.kotlinpoet}",
