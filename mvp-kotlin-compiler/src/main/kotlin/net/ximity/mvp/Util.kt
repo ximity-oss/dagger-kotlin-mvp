@@ -21,6 +21,7 @@ import javax.tools.Diagnostic
  * @author by Emarc Magtanong on 2017/08/16.
  */
 object Util {
+    const val OUTPUT_FLAG = "mvpDebugLogs"
     private const val generatedKotlin = "kapt.kotlin.generated"
     private var messager: Messager? = null
     private var filer: Filer? = null
@@ -66,7 +67,7 @@ object Util {
         return value == null || value.isEmpty()
     }
 
-    internal fun getGeneratedDirectory() : File? {
+    internal fun getGeneratedDirectory(): File? {
         return generatedDirectory
     }
 
@@ -99,23 +100,22 @@ object Util {
         return typeUtil!!.isSubtype(type, viewPresenter)
     }
 
-    fun writeJavaFile(file: JavaFile, generatedFile: String) {
-        if (!isEmpty(generatedFile)) Util.note("Generating $generatedFile...")
+    fun writeJavaFile(file: JavaFile, generatedFile: String, shouldLog: Boolean) {
+        if (shouldLog && !isEmpty(generatedFile)) Util.note("Generating $generatedFile...")
         try {
             file.writeTo(filer)
-            if (!isEmpty(generatedFile)) Util.note("Generated $generatedFile")
+            if (shouldLog && !isEmpty(generatedFile)) Util.note("Generated $generatedFile")
         } catch (e: IOException) {
-            if (!isEmpty(generatedFile)) Util.warn("Unable to generate file for $generatedFile!")
+            if (shouldLog && !isEmpty(generatedFile)) Util.warn("Unable to generate file for $generatedFile!")
         }
-
     }
 }
 
-fun FileSpec.writeFile() {
+fun FileSpec.writeFile(shouldLog: Boolean) {
     try {
         this.writeTo(Util.getGeneratedDirectory()!!)
-        if (!Util.isEmpty(this.name)) Util.note("Generated ${this.name}")
+        if (shouldLog && !Util.isEmpty(this.name)) Util.note("Generated ${this.name}")
     } catch (e: Exception) {
-        if (!Util.isEmpty(this.name)) Util.warn("Unable to generate file for ${this.name}!")
+        if (shouldLog && !Util.isEmpty(this.name)) Util.warn("Unable to generate file for ${this.name}!")
     }
 }

@@ -27,6 +27,9 @@ android {
 
 kapt {
     correctErrorTypes = true
+    arguments {
+        arg("mvpDebugLogs", "true")
+    }
 }
 
 sourceSets {

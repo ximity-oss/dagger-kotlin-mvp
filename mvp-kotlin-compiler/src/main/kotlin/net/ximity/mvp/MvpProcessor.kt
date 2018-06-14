@@ -28,6 +28,7 @@ class MvpProcessor : AbstractProcessor() {
     private val templatePackageName = "net.ximity.mvp.template"
     private val contractPackageName = "net.ximity.mvp.contract"
     private var halt = false
+    private var shouldLog = false
     private val bindings = ArrayList<Binding>()
 
     override fun getSupportedSourceVersion(): SourceVersion {
@@ -38,6 +39,8 @@ class MvpProcessor : AbstractProcessor() {
     override fun init(processingEnv: ProcessingEnvironment) {
         super.init(processingEnv)
         Util.init(processingEnv)
+        val debugLogs = processingEnv.options[Util.OUTPUT_FLAG]
+        shouldLog = debugLogs?.toBoolean() == true
     }
 
     override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
@@ -53,6 +56,7 @@ class MvpProcessor : AbstractProcessor() {
     }
 
     private fun processAnnotations(roundEnv: RoundEnvironment): Boolean {
+
         return processMvpModules(roundEnv) &&
                 processMvpSubcomponents(roundEnv) &&
                 processMainComponent(roundEnv)
@@ -174,7 +178,7 @@ class MvpProcessor : AbstractProcessor() {
                         .build())
                 .addMethods(moduleFunctions)
                 .build())
-                .build(), moduleClassName)
+                .build(), moduleClassName, shouldLog)
 
         return true
     }
@@ -237,7 +241,7 @@ class MvpProcessor : AbstractProcessor() {
                 .build()
 
         Util.writeJavaFile(JavaFile.builder(packageName, mvpBindings)
-                .build(), componentName)
+                .build(), componentName, shouldLog)
 
         bindings.add(Binding(packageName, componentName, moduleName))
         return true
@@ -287,7 +291,7 @@ class MvpProcessor : AbstractProcessor() {
                         .superclass(ParameterizedTypeName.get(templateApplication, mainComponent))
                         .build())
                 .build()
-                .writeFile()
+                .writeFile(shouldLog)
 
         val templateActivity = ClassName(templatePackageName, "MvpActivity")
         FileSpec.builder(templatePackageName, "BaseMvpActivity")
@@ -296,7 +300,7 @@ class MvpProcessor : AbstractProcessor() {
                         .superclass(ParameterizedTypeName.get(templateActivity, mainComponent))
                         .build())
                 .build()
-                .writeFile()
+                .writeFile(shouldLog)
 
         val templateFragment = ClassName(templatePackageName, "MvpFragment")
         FileSpec.builder(templatePackageName, "BaseMvpFragment")
@@ -305,7 +309,7 @@ class MvpProcessor : AbstractProcessor() {
                         .superclass(ParameterizedTypeName.get(templateFragment, mainComponent))
                         .build())
                 .build()
-                .writeFile()
+                .writeFile(shouldLog)
 
         val templateDialog = ClassName(templatePackageName, "MvpDialog")
         FileSpec.builder(templatePackageName, "BaseMvpDialog")
@@ -314,7 +318,7 @@ class MvpProcessor : AbstractProcessor() {
                         .superclass(ParameterizedTypeName.get(templateDialog, mainComponent))
                         .build())
                 .build()
-                .writeFile()
+                .writeFile(shouldLog)
 
         val templateReceiver = ClassName(templatePackageName, "MvpBroadcastReceiver")
         FileSpec.builder(templatePackageName, "BaseMvpBroadcastReceiver")
@@ -323,7 +327,7 @@ class MvpProcessor : AbstractProcessor() {
                         .superclass(ParameterizedTypeName.get(templateReceiver, mainComponent))
                         .build())
                 .build()
-                .writeFile()
+                .writeFile(shouldLog)
 
         val templateService = ClassName(templatePackageName, "MvpService")
         FileSpec.builder(templatePackageName, "BaseMvpService")
@@ -332,7 +336,7 @@ class MvpProcessor : AbstractProcessor() {
                         .superclass(ParameterizedTypeName.get(templateService, mainComponent))
                         .build())
                 .build()
-                .writeFile()
+                .writeFile(shouldLog)
 
         return true
     }
@@ -400,7 +404,7 @@ class MvpProcessor : AbstractProcessor() {
                         .addFunctions(activityMethods)
                         .build())
                 .build()
-                .writeFile()
+                .writeFile(shouldLog)
 
         val fragmentMethods = ArrayList<FunSpec>()
 
@@ -466,7 +470,7 @@ class MvpProcessor : AbstractProcessor() {
                         .addFunctions(fragmentMethods)
                         .build())
                 .build()
-                .writeFile()
+                .writeFile(shouldLog)
 
         val baseDialog = ClassName(templatePackageName, "MvpDialog")
         FileSpec.builder(templatePackageName, "DialogView")
@@ -479,7 +483,7 @@ class MvpProcessor : AbstractProcessor() {
                         .addFunctions(fragmentMethods)
                         .build())
                 .build()
-                .writeFile()
+                .writeFile(shouldLog)
 
         return true
     }
@@ -503,7 +507,7 @@ class MvpProcessor : AbstractProcessor() {
                 .let {
                     JavaFile.builder(getPackage(element).qualifiedName.toString(), it)
                             .build()
-                }.let { Util.writeJavaFile(it, componentName) }
+                }.let { Util.writeJavaFile(it, componentName, shouldLog) }
 
         return true
     }
