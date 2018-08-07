@@ -7,7 +7,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.18.0'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.20.0'
     }
 
     ext {
@@ -39,7 +39,7 @@ buildscript {
             'build'     : '27.0.3',
             'support'   : '27.1.1',
 
-            'bintray'   : '1.8.1',
+            'bintray'   : '1.8.4',
             'dexcount'  : '0.8.2',
             'maven'     : '2.1',
 
@@ -47,8 +47,8 @@ buildscript {
             'dagger'    : '2.16',
             'inject'    : '1',
             'javax'     : '1.3.2',
-            'kotlinpoet': '0.7.0',
-            'kotlin'    : '1.2.50',
+            'kotlinpoet': '1.0.0-RC1',
+            'kotlin'    : '1.2.60',
             'javapoet'  : '1.11.1',
     ]
 

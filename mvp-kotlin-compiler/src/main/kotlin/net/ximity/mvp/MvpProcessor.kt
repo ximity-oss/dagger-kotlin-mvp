@@ -6,6 +6,7 @@ import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.MethodSpec
 import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import net.ximity.annotation.MvpContract
 import net.ximity.annotation.MvpMainComponent
 import net.ximity.annotation.MvpScope
@@ -288,7 +289,7 @@ class MvpProcessor : AbstractProcessor() {
         FileSpec.builder(templatePackageName, "BaseMvpApplication")
                 .addType(TypeSpec.classBuilder("BaseMvpApplication")
                         .addModifiers(KModifier.ABSTRACT)
-                        .superclass(ParameterizedTypeName.get(templateApplication, mainComponent))
+                        .superclass(templateApplication.parameterizedBy(mainComponent))
                         .build())
                 .build()
                 .writeFile(shouldLog)
@@ -297,7 +298,7 @@ class MvpProcessor : AbstractProcessor() {
         FileSpec.builder(templatePackageName, "BaseMvpActivity")
                 .addType(TypeSpec.classBuilder("BaseMvpActivity")
                         .addModifiers(KModifier.ABSTRACT)
-                        .superclass(ParameterizedTypeName.get(templateActivity, mainComponent))
+                        .superclass(templateActivity.parameterizedBy(mainComponent))
                         .build())
                 .build()
                 .writeFile(shouldLog)
@@ -306,7 +307,7 @@ class MvpProcessor : AbstractProcessor() {
         FileSpec.builder(templatePackageName, "BaseMvpFragment")
                 .addType(TypeSpec.classBuilder("BaseMvpFragment")
                         .addModifiers(KModifier.ABSTRACT)
-                        .superclass(ParameterizedTypeName.get(templateFragment, mainComponent))
+                        .superclass(templateFragment.parameterizedBy(mainComponent))
                         .build())
                 .build()
                 .writeFile(shouldLog)
@@ -315,7 +316,7 @@ class MvpProcessor : AbstractProcessor() {
         FileSpec.builder(templatePackageName, "BaseMvpDialog")
                 .addType(TypeSpec.classBuilder("BaseMvpDialog")
                         .addModifiers(KModifier.ABSTRACT)
-                        .superclass(ParameterizedTypeName.get(templateDialog, mainComponent))
+                        .superclass(templateDialog.parameterizedBy(mainComponent))
                         .build())
                 .build()
                 .writeFile(shouldLog)
@@ -324,7 +325,7 @@ class MvpProcessor : AbstractProcessor() {
         FileSpec.builder(templatePackageName, "BaseMvpBroadcastReceiver")
                 .addType(TypeSpec.classBuilder("BaseMvpBroadcastReceiver")
                         .addModifiers(KModifier.ABSTRACT)
-                        .superclass(ParameterizedTypeName.get(templateReceiver, mainComponent))
+                        .superclass(templateReceiver.parameterizedBy(mainComponent))
                         .build())
                 .build()
                 .writeFile(shouldLog)
@@ -333,7 +334,7 @@ class MvpProcessor : AbstractProcessor() {
         FileSpec.builder(templatePackageName, "BaseMvpService")
                 .addType(TypeSpec.classBuilder("BaseMvpService")
                         .addModifiers(KModifier.ABSTRACT)
-                        .superclass(ParameterizedTypeName.get(templateService, mainComponent))
+                        .superclass(templateService.parameterizedBy(mainComponent))
                         .build())
                 .build()
                 .writeFile(shouldLog)
@@ -397,7 +398,7 @@ class MvpProcessor : AbstractProcessor() {
         FileSpec.builder(templatePackageName, "ActivityView")
                 .addType(TypeSpec.classBuilder("ActivityView")
                         .addModifiers(KModifier.ABSTRACT)
-                        .superclass(ParameterizedTypeName.get(baseActivity, mainComponent))
+                        .superclass(baseActivity.parameterizedBy(mainComponent))
                         .addProperty(PropertySpec.varBuilder("viewPresenter", ClassName(contractPackageName, "MvpPresenter"))
                                 .addModifiers(KModifier.PRIVATE, KModifier.LATEINIT)
                                 .build())
@@ -463,7 +464,7 @@ class MvpProcessor : AbstractProcessor() {
         FileSpec.builder(templatePackageName, "FragmentView")
                 .addType(TypeSpec.classBuilder("FragmentView")
                         .addModifiers(KModifier.ABSTRACT)
-                        .superclass(ParameterizedTypeName.get(baseFragment, mainComponent))
+                        .superclass(baseFragment.parameterizedBy(mainComponent))
                         .addProperty(PropertySpec.varBuilder("viewPresenter", ClassName(contractPackageName, "MvpPresenter"))
                                 .addModifiers(KModifier.PRIVATE, KModifier.LATEINIT)
                                 .build())
@@ -476,7 +477,7 @@ class MvpProcessor : AbstractProcessor() {
         FileSpec.builder(templatePackageName, "DialogView")
                 .addType(TypeSpec.classBuilder("DialogView")
                         .addModifiers(KModifier.ABSTRACT)
-                        .superclass(ParameterizedTypeName.get(baseDialog, mainComponent))
+                        .superclass(baseDialog.parameterizedBy(mainComponent))
                         .addProperty(PropertySpec.varBuilder("viewPresenter", ClassName(contractPackageName, "MvpPresenter"))
                                 .addModifiers(KModifier.PRIVATE, KModifier.LATEINIT)
                                 .build())
