@@ -318,6 +318,7 @@ class MvpProcessor : AbstractProcessor() {
         FileSpec.builder(templatePackageName, "BaseMvpDialog")
                 .addType(TypeSpec.classBuilder("BaseMvpDialog")
                         .addModifiers(KModifier.ABSTRACT)
+                        .superclass(ParameterizedTypeName.get(templateDialog, mainComponent))
 //                        .superclass(templateDialog.parameterizedBy(mainComponent))
                         .build())
                 .build()
