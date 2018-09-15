@@ -30,7 +30,7 @@ interface MvpPresenter<V : MvpView> {
      */
     @SuppressLint("LogNotTimber")
     fun resume() {
-        Log.d("Presenter", "Started: ${this}")
+        Log.d("Presenter", "Resumed: ${this}")
     }
 
     /**
