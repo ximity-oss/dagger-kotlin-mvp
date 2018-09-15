@@ -14,13 +14,13 @@ import javax.inject.Inject
 @MvpScope
 class LoginPresenter @Inject internal constructor(
         /** [LoginView] **/
-        private val view: LoginMvp.View,
+        override var view: LoginMvp.View?,
         /** Application resources **/
         private val resources: Resources
 ) : LoginMvp.Presenter {
 
     override fun login() {
-        view.showError(resources.getString(R.string.logging_in))
-        view.showHome()
+        view?.showError(resources.getString(R.string.logging_in))
+        view?.showHome()
     }
 }

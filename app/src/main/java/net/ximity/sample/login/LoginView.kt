@@ -12,7 +12,7 @@ import net.ximity.sample.login.mvp.LoginPresenter
 import javax.inject.Inject
 
 class LoginView :
-        BaseActivity(),
+        BaseActivity<LoginMvp.Presenter>(),
         LoginMvp.View {
 
     /** [LoginPresenter] **/

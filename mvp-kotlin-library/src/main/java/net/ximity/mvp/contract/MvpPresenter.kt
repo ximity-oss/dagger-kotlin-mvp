@@ -3,6 +3,7 @@ package net.ximity.mvp.contract
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
+import android.support.annotation.CallSuper
 import android.support.v4.app.Fragment
 import android.util.Log
 
@@ -11,7 +12,9 @@ import android.util.Log
  *
  * @author by Emarc Magtanong on 2018/04/07.
  */
-interface MvpPresenter {
+interface MvpPresenter<V : MvpView> {
+    var view: V?
+
     /**
      * Lifecycle callback bound to [Activity.onCreate] or [Fragment.onViewCreated]
      *
@@ -20,6 +23,14 @@ interface MvpPresenter {
     @SuppressLint("LogNotTimber")
     fun create(saved: Bundle?) {
         Log.d("Presenter", "Created: ${this}")
+    }
+
+    /**
+     * Lifecycle callback bound to [Activity.onResume] or [Fragment.onResume]
+     */
+    @SuppressLint("LogNotTimber")
+    fun resume() {
+        Log.d("Presenter", "Started: ${this}")
     }
 
     /**
@@ -64,7 +75,9 @@ interface MvpPresenter {
      * Lifecycle callback bound to [Activity.onDestroy] or [Fragment.onDestroy]
      */
     @SuppressLint("LogNotTimber")
+    @CallSuper
     fun destroy() {
         Log.d("Presenter", "Destroyed: ${this}")
+        view = null
     }
 }

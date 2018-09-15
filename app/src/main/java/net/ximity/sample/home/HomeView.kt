@@ -13,7 +13,7 @@ import net.ximity.sample.home.mvp.HomePresenter
 import javax.inject.Inject
 
 class HomeView :
-        BaseActivity(),
+        BaseActivity<HomeMvp.Presenter>(),
         HomeMvp.View {
 
     /** [HomePresenter] **/

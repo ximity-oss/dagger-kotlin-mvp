@@ -20,7 +20,7 @@ interface LoginMvp {
         fun showHome()
     }
 
-    interface Presenter : MvpPresenter {
+    interface Presenter : MvpPresenter<View> {
         /**
          * Fake login to navigate to [HomeView]
          */

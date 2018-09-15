@@ -19,7 +19,7 @@ interface HomeMvp {
         fun onLogout()
     }
 
-    interface Presenter : MvpPresenter {
+    interface Presenter : MvpPresenter<View> {
         /**
          * Fake logout
          */

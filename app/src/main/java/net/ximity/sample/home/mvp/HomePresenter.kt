@@ -14,13 +14,13 @@ import javax.inject.Inject
 @MvpScope
 class HomePresenter @Inject internal constructor(
         /** [HomeView] **/
-        private val view: HomeMvp.View,
+        override var view: HomeMvp.View?,
         /** Application resources **/
         private val resources: Resources
 ) : HomeMvp.Presenter {
 
     override fun logout() {
-        view.showError(resources.getString(R.string.logging_out))
-        view.onLogout()
+        view?.showError(resources.getString(R.string.logging_out))
+        view?.onLogout()
     }
 }
