@@ -5,7 +5,7 @@ targetCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
     compileOnly deps.dagger.inject
-    compile deps.kotlin
+    implementation deps.kotlin.stdlib
 }
 
 apply from: rootProject.file('gradle/install.gradle')

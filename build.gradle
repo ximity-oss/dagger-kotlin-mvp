@@ -7,7 +7,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.20.0'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.22.0'
     }
 
     ext {
@@ -32,23 +32,23 @@ buildscript {
     ext.versions = [
             'code'      : ext.libraryCode,
             'name'      : ext.libraryVersion,
-            'min'       : 15,
+            'min'       : 19,
 
-            'compile'   : 27,
-            'plugin'    : '3.1.4',
-            'build'     : '27.0.3',
-            'support'   : '27.1.1',
+            'compile'   : 28,
+            'plugin'    : '3.5.0',
 
             'bintray'   : '1.8.4',
             'dexcount'  : '0.8.2',
             'maven'     : '2.1',
 
+            'annotation': '1.1.0',
+            'appcompat' : '1.1.0-rc01',
             'autocommon': '0.10',
-            'dagger'    : '2.17',
+            'dagger'    : '2.24',
             'inject'    : '1',
             'javax'     : '1.3.2',
-            'kotlinpoet': '1.0.0-RC1',
-            'kotlin'    : '1.2.70',
+            'kotlinpoet': '1.3.0',
+            'kotlin'    : '1.3.50',
             'javapoet'  : '1.11.1',
     ]
 
@@ -69,14 +69,17 @@ buildscript {
                     'annotations': "javax.annotation:javax.annotation-api:${versions.javax}",
                     'inject'     : "javax.inject:javax.inject:${versions.inject}",
             ],
-            'kotlin' : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}",
+            'kotlin' : [
+                    'stdlib': "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}",
+                    'reflect': "org.jetbrains.kotlin:kotlin-reflect:${versions.kotlin}",
+            ],
             'poet'   : [
                     'java'  : "com.squareup:javapoet:${versions.javapoet}",
                     'kotlin': "com.squareup:kotlinpoet:${versions.kotlinpoet}",
             ],
-            'support': [
-                    'appcompatv7': "com.android.support:appcompat-v7:${versions.support}",
-                    'annotations': "com.android.support:support-annotations:${versions.support}",
+            'jetpack': [
+                    'appcompat'  : "androidx.appcompat:appcompat:${versions.appcompat}",
+                    'annotations': "androidx.annotation:annotation:${versions.annotation}",
             ],
     ]
 }

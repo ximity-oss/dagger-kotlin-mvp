@@ -10,10 +10,7 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import net.ximity.annotation.MvpContract
 import net.ximity.annotation.MvpMainComponent
 import net.ximity.annotation.MvpScope
-import javax.annotation.processing.AbstractProcessor
-import javax.annotation.processing.ProcessingEnvironment
-import javax.annotation.processing.RoundEnvironment
-import javax.annotation.processing.SupportedAnnotationTypes
+import javax.annotation.processing.*
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.Modifier
@@ -23,6 +20,10 @@ import javax.lang.model.type.TypeMirror
 @SupportedAnnotationTypes(
         "net.ximity.annotation.MvpMainComponent",
         "net.ximity.annotation.MvpContract"
+)
+@SupportedOptions(
+        Util.OUTPUT_FLAG,
+        "kapt.kotlin.generated"
 )
 class MvpProcessor : AbstractProcessor() {
 
@@ -172,7 +173,7 @@ class MvpProcessor : AbstractProcessor() {
                         .build())
                 .addMethod(MethodSpec.constructorBuilder()
                         .addParameter(com.squareup.javapoet.ParameterSpec.builder(com.squareup.javapoet.ClassName.get(viewInterface.get()), "view")
-                                .addAnnotation(com.squareup.javapoet.ClassName.get("android.support.annotation", "NonNull"))
+                                .addAnnotation(com.squareup.javapoet.ClassName.get("androidx.annotation", "NonNull"))
                                 .build())
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("this.\$N = \$N", "view", "view")
@@ -232,7 +233,7 @@ class MvpProcessor : AbstractProcessor() {
                         .addMember("modules", "\$N.class", moduleName)
                         .build())
                 .addMethod(MethodSpec.methodBuilder("bind")
-                        .addAnnotation(AnnotationSpec.builder(com.squareup.javapoet.ClassName.get("android.support.annotation", "CheckResult"))
+                        .addAnnotation(AnnotationSpec.builder(com.squareup.javapoet.ClassName.get("androidx.annotation", "CheckResult"))
                                 .addMember("suggest", "\"#bindPresenter(net.ximity.mvp.contract.MvpPresenter)\"")
                                 .build())
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
@@ -286,58 +287,52 @@ class MvpProcessor : AbstractProcessor() {
     private fun generateBaseComponents(element: TypeElement): Boolean {
         val templateApplication = ClassName(templatePackageName, "MvpApplication")
         val mainComponent = ClassName.bestGuess(element.toString())
-        FileSpec.builder(templatePackageName, "BaseMvpApplication")
+        Util.writeFile(FileSpec.builder(templatePackageName, "BaseMvpApplication")
                 .addType(TypeSpec.classBuilder("BaseMvpApplication")
                         .addModifiers(KModifier.ABSTRACT)
                         .superclass(templateApplication.parameterizedBy(mainComponent))
                         .build())
-                .build()
-                .writeFile(shouldLog)
+                .build(), shouldLog)
 
         val templateActivity = ClassName(templatePackageName, "MvpActivity")
-        FileSpec.builder(templatePackageName, "BaseMvpActivity")
+        Util.writeFile(FileSpec.builder(templatePackageName, "BaseMvpActivity")
                 .addType(TypeSpec.classBuilder("BaseMvpActivity")
                         .addModifiers(KModifier.ABSTRACT)
                         .superclass(templateActivity.parameterizedBy(mainComponent))
                         .build())
-                .build()
-                .writeFile(shouldLog)
+                .build(), shouldLog)
 
         val templateFragment = ClassName(templatePackageName, "MvpFragment")
-        FileSpec.builder(templatePackageName, "BaseMvpFragment")
+        Util.writeFile(FileSpec.builder(templatePackageName, "BaseMvpFragment")
                 .addType(TypeSpec.classBuilder("BaseMvpFragment")
                         .addModifiers(KModifier.ABSTRACT)
                         .superclass(templateFragment.parameterizedBy(mainComponent))
                         .build())
-                .build()
-                .writeFile(shouldLog)
+                .build(), shouldLog)
 
         val templateDialog = ClassName(templatePackageName, "MvpDialog")
-        FileSpec.builder(templatePackageName, "BaseMvpDialog")
+        Util.writeFile(FileSpec.builder(templatePackageName, "BaseMvpDialog")
                 .addType(TypeSpec.classBuilder("BaseMvpDialog")
                         .addModifiers(KModifier.ABSTRACT)
                         .superclass(templateDialog.parameterizedBy(mainComponent))
                         .build())
-                .build()
-                .writeFile(shouldLog)
+                .build(), shouldLog)
 
         val templateReceiver = ClassName(templatePackageName, "MvpBroadcastReceiver")
-        FileSpec.builder(templatePackageName, "BaseMvpBroadcastReceiver")
+        Util.writeFile(FileSpec.builder(templatePackageName, "BaseMvpBroadcastReceiver")
                 .addType(TypeSpec.classBuilder("BaseMvpBroadcastReceiver")
                         .addModifiers(KModifier.ABSTRACT)
                         .superclass(templateReceiver.parameterizedBy(mainComponent))
                         .build())
-                .build()
-                .writeFile(shouldLog)
+                .build(), shouldLog)
 
         val templateService = ClassName(templatePackageName, "MvpService")
-        FileSpec.builder(templatePackageName, "BaseMvpService")
+        Util.writeFile(FileSpec.builder(templatePackageName, "BaseMvpService")
                 .addType(TypeSpec.classBuilder("BaseMvpService")
                         .addModifiers(KModifier.ABSTRACT)
                         .superclass(templateService.parameterizedBy(mainComponent))
                         .build())
-                .build()
-                .writeFile(shouldLog)
+                .build(), shouldLog)
 
         return true
     }
@@ -347,14 +342,14 @@ class MvpProcessor : AbstractProcessor() {
         val activityMethods = ArrayList<FunSpec>()
 
         activityMethods.add(FunSpec.builder("bindPresenter")
-                .addParameter(ParameterSpec.builder("viewPresenter", ClassName.bestGuess("P"))
+                .addParameter(ParameterSpec.builder("viewPresenter", TypeVariableName("P"))
                         .build())
                 .addStatement("this.viewPresenter = viewPresenter")
                 .build())
 
         activityMethods.add(FunSpec.builder("onCreate")
                 .addParameter(ParameterSpec.builder("savedInstanceState", ClassName("android.os", "Bundle")
-                        .asNullable())
+                        .copy(nullable = true))
                         .build())
                 .addModifiers(KModifier.OVERRIDE)
                 .addStatement("super.onCreate(savedInstanceState)")
@@ -375,8 +370,7 @@ class MvpProcessor : AbstractProcessor() {
 
         activityMethods.add(FunSpec.builder("onSaveInstanceState")
                 .addModifiers(KModifier.OVERRIDE)
-                .addParameter(ParameterSpec.builder("outState", ClassName("android.os", "Bundle")
-                        .asNonNullable())
+                .addParameter(ParameterSpec.builder("outState", ClassName("android.os", "Bundle"))
                         .build())
                 .addStatement("super.onSaveInstanceState(outState)")
                 .addStatement("viewPresenter.saveState(outState)")
@@ -401,20 +395,19 @@ class MvpProcessor : AbstractProcessor() {
                 .build())
 
         val baseActivity = ClassName(templatePackageName, "MvpActivity")
-        FileSpec.builder(templatePackageName, "ActivityView")
+        Util.writeFile(FileSpec.builder(templatePackageName, "ActivityView")
                 .addType(TypeSpec.classBuilder("ActivityView")
-                        .addTypeVariable(TypeVariableName("P")
-                                .withBounds(ClassName(contractPackageName, "MvpPresenter")
-                                        .parameterizedBy(WildcardTypeName.subtypeOf(ClassName(contractPackageName, "MvpView")))))
+                        .addTypeVariable(TypeVariableName.invoke("P", ClassName(contractPackageName, "MvpPresenter")
+                                .parameterizedBy(WildcardTypeName.producerOf(ClassName(contractPackageName, "MvpView")))))
                         .addModifiers(KModifier.ABSTRACT)
                         .superclass(baseActivity.parameterizedBy(mainComponent))
-                        .addProperty(PropertySpec.varBuilder("viewPresenter", TypeVariableName("P"))
+                        .addProperty(PropertySpec.builder("viewPresenter", TypeVariableName.invoke("P"))
+                                .mutable()
                                 .addModifiers(KModifier.PRIVATE, KModifier.LATEINIT)
                                 .build())
                         .addFunctions(activityMethods)
                         .build())
-                .build()
-                .writeFile(shouldLog)
+                .build(), shouldLog)
 
         val fragmentMethods = ArrayList<FunSpec>()
 
@@ -426,11 +419,10 @@ class MvpProcessor : AbstractProcessor() {
 
         fragmentMethods.add(FunSpec.builder("onViewCreated")
                 .addModifiers(KModifier.OVERRIDE)
-                .addParameter(ParameterSpec.builder("view", ClassName("android.view", "View")
-                        .asNonNullable())
+                .addParameter(ParameterSpec.builder("view", ClassName("android.view", "View"))
                         .build())
                 .addParameter(ParameterSpec.builder("savedInstanceState", ClassName("android.os", "Bundle")
-                        .asNullable())
+                        .copy(nullable = true))
                         .build())
                 .addStatement("super.onViewCreated(view, savedInstanceState)")
                 .addStatement("viewPresenter.create(savedInstanceState)")
@@ -450,8 +442,7 @@ class MvpProcessor : AbstractProcessor() {
 
         fragmentMethods.add(FunSpec.builder("onSaveInstanceState")
                 .addModifiers(KModifier.OVERRIDE)
-                .addParameter(ParameterSpec.builder("outState", ClassName("android.os", "Bundle")
-                        .asNonNullable())
+                .addParameter(ParameterSpec.builder("outState", ClassName("android.os", "Bundle"))
                         .build())
                 .addStatement("super.onSaveInstanceState(outState)")
                 .addStatement("viewPresenter.saveState(outState)")
@@ -476,36 +467,34 @@ class MvpProcessor : AbstractProcessor() {
                 .build())
 
         val baseFragment = ClassName(templatePackageName, "MvpFragment")
-        FileSpec.builder(templatePackageName, "FragmentView")
+        Util.writeFile(FileSpec.builder(templatePackageName, "FragmentView")
                 .addType(TypeSpec.classBuilder("FragmentView")
-                        .addTypeVariable(TypeVariableName("P")
-                                .withBounds(ClassName(contractPackageName, "MvpPresenter")
-                                        .parameterizedBy(WildcardTypeName.subtypeOf(ClassName(contractPackageName, "MvpView")))))
+                        .addTypeVariable(TypeVariableName.invoke("P", ClassName(contractPackageName, "MvpPresenter")
+                                .parameterizedBy(WildcardTypeName.producerOf(ClassName(contractPackageName, "MvpView")))))
                         .addModifiers(KModifier.ABSTRACT)
                         .superclass(baseFragment.parameterizedBy(mainComponent))
-                        .addProperty(PropertySpec.varBuilder("viewPresenter", TypeVariableName("P"))
+                        .addProperty(PropertySpec.builder("viewPresenter", TypeVariableName("P"))
+                                .mutable()
                                 .addModifiers(KModifier.PRIVATE, KModifier.LATEINIT)
                                 .build())
                         .addFunctions(fragmentMethods)
                         .build())
-                .build()
-                .writeFile(shouldLog)
+                .build(), shouldLog)
 
         val baseDialog = ClassName(templatePackageName, "MvpDialog")
-        FileSpec.builder(templatePackageName, "DialogView")
+        Util.writeFile(FileSpec.builder(templatePackageName, "DialogView")
                 .addType(TypeSpec.classBuilder("DialogView")
-                        .addTypeVariable(TypeVariableName("P")
-                                .withBounds(ClassName(contractPackageName, "MvpPresenter")
-                                        .parameterizedBy(WildcardTypeName.subtypeOf(ClassName(contractPackageName, "MvpView")))))
+                        .addTypeVariable(TypeVariableName.invoke("P", ClassName(contractPackageName, "MvpPresenter")
+                                .parameterizedBy(WildcardTypeName.producerOf(ClassName(contractPackageName, "MvpView")))))
                         .addModifiers(KModifier.ABSTRACT)
                         .superclass(baseDialog.parameterizedBy(mainComponent))
-                        .addProperty(PropertySpec.varBuilder("viewPresenter", TypeVariableName("P"))
+                        .addProperty(PropertySpec.builder("viewPresenter", TypeVariableName("P"))
+                                .mutable()
                                 .addModifiers(KModifier.PRIVATE, KModifier.LATEINIT)
                                 .build())
                         .addFunctions(fragmentMethods)
                         .build())
-                .build()
-                .writeFile(shouldLog)
+                .build(), shouldLog)
 
         return true
     }

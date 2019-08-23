@@ -9,7 +9,8 @@ dependencies {
     implementation project(':mvp-kotlin-annotations')
 
     /** Build dependencies **/
-    implementation deps.kotlin
+    implementation deps.kotlin.stdlib
+    implementation deps.kotlin.reflect
     implementation deps.auto.common
     api deps.poet.kotlin
     api deps.poet.java

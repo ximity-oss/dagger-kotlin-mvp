@@ -3,8 +3,6 @@ package net.ximity.mvp
 import com.squareup.javapoet.JavaFile
 import com.squareup.kotlinpoet.FileSpec
 import net.ximity.annotation.MvpContract
-import java.io.File
-import java.io.IOException
 import javax.annotation.processing.Filer
 import javax.annotation.processing.Messager
 import javax.annotation.processing.ProcessingEnvironment
@@ -22,41 +20,28 @@ import javax.tools.Diagnostic
  */
 object Util {
     const val OUTPUT_FLAG = "mvpDebugLogs"
-    private const val generatedKotlin = "kapt.kotlin.generated"
     private var messager: Messager? = null
     private var filer: Filer? = null
     private var typeUtil: Types? = null
     private var elementUtil: Elements? = null
-    private var generatedDirectory: File? = null
 
     fun init(environment: ProcessingEnvironment) {
         messager = environment.messager
         filer = environment.filer
         typeUtil = environment.typeUtils
         elementUtil = environment.elementUtils
-
-        val generatedDirectoryPath: String = environment.options[generatedKotlin]
-                ?.replace("kaptKotlin", "kapt") ?: ""
-        if (isEmpty(generatedDirectoryPath)) {
-            error("Can't find the target directory for generated Kotlin files.")
-        }
-
-        generatedDirectory = File(generatedDirectoryPath)
-        if (generatedDirectory?.parentFile?.exists() == false) {
-            generatedDirectory?.parentFile?.mkdirs()
-        }
     }
 
     internal fun error(message: String) {
-        messager!!.printMessage(Diagnostic.Kind.ERROR, message)
+        messager?.printMessage(Diagnostic.Kind.ERROR, message)
     }
 
     internal fun warn(message: String) {
-        messager!!.printMessage(Diagnostic.Kind.WARNING, message)
+        messager?.printMessage(Diagnostic.Kind.WARNING, message)
     }
 
     internal fun note(message: String) {
-        messager!!.printMessage(Diagnostic.Kind.NOTE, message)
+        messager?.printMessage(Diagnostic.Kind.NOTE, message)
     }
 
     internal fun isEmpty(collection: Collection<*>?): Boolean {
@@ -65,10 +50,6 @@ object Util {
 
     internal fun isEmpty(value: String?): Boolean {
         return value == null || value.isEmpty()
-    }
-
-    internal fun getGeneratedDirectory(): File? {
-        return generatedDirectory
     }
 
     internal fun getView(element: TypeElement): TypeElement? {
@@ -101,21 +82,22 @@ object Util {
     }
 
     fun writeJavaFile(file: JavaFile, generatedFile: String, shouldLog: Boolean) {
-        if (shouldLog && !isEmpty(generatedFile)) Util.note("Generating $generatedFile...")
+        if (shouldLog && !isEmpty(generatedFile)) note("Generating $generatedFile...\n")
         try {
             file.writeTo(filer)
-            if (shouldLog && !isEmpty(generatedFile)) Util.note("Generated $generatedFile")
-        } catch (e: IOException) {
-            if (shouldLog && !isEmpty(generatedFile)) Util.warn("Unable to generate file for $generatedFile!")
+            if (shouldLog && !isEmpty(generatedFile)) note("Generated $generatedFile\n")
+        } catch (e: Exception) {
+            if (shouldLog && !isEmpty(generatedFile)) warn("Unable to generate file for $generatedFile!\n")
         }
     }
-}
 
-fun FileSpec.writeFile(shouldLog: Boolean) {
-    try {
-        this.writeTo(Util.getGeneratedDirectory()!!)
-        if (shouldLog && !Util.isEmpty(this.name)) Util.note("Generated ${this.name}")
-    } catch (e: Exception) {
-        if (shouldLog && !Util.isEmpty(this.name)) Util.warn("Unable to generate file for ${this.name}!")
+    fun writeFile(filesSpec: FileSpec, shouldLog: Boolean) {
+        if (shouldLog && !isEmpty(filesSpec.name)) note("Generating ${filesSpec.name}...\n")
+        try {
+            filer?.also(filesSpec::writeTo)
+            if (shouldLog && !isEmpty(filesSpec.name)) note("Generated ${filesSpec.name}\n")
+        } catch (e: Exception) {
+            if (shouldLog && !isEmpty(filesSpec.name)) warn("Unable to generate file for ${filesSpec.name}!\n")
+        }
     }
 }

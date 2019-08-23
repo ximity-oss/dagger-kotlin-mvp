@@ -3,9 +3,9 @@ package net.ximity.mvp.contract
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
-import android.support.annotation.CallSuper
-import android.support.v4.app.Fragment
 import android.util.Log
+import androidx.annotation.CallSuper
+import androidx.fragment.app.Fragment
 
 /**
  * Base view presenter contract with hooks to view lifecycle

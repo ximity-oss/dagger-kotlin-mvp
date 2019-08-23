@@ -3,7 +3,6 @@ apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion versions.compile
-    buildToolsVersion versions.build
 
     defaultConfig {
         minSdkVersion versions.min
@@ -21,8 +20,9 @@ dependencies {
     api project(':mvp-kotlin-annotations')
 
     /** Build dependencies **/
-    api deps.support.appcompatv7
-    implementation deps.support.annotations
+    api deps.jetpack.appcompat
+    implementation deps.jetpack.annotations
+    implementation deps.kotlin.stdlib
     compileOnly deps.dagger.inject
 }
 

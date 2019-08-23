@@ -11,8 +11,8 @@ import net.ximity.mvp.template.ActivityView
  * @author by Emarc Magtanong on 2018/04/09.
  */
 abstract class BaseActivity<P : MvpPresenter<out MvpView>>
-: ActivityView<P>(),
-MvpView {
+    : ActivityView<P>(),
+        MvpView {
 
     override fun showError(message: String) =
             Toast.makeText(this, message, Toast.LENGTH_SHORT)
